@@ -3,7 +3,7 @@ import warnings
 
 import requests
 
-from lian_jia.config import INTERVAL
+from lian_jia.config import INTERVAL, VERBOSE
 from lian_jia.utils import get_user_agent
 
 LAST_REQUEST_TIME = 0
@@ -15,7 +15,8 @@ def get(url: str):
 
     if (status := response.status_code) != 200:
         warnings.warn(f"Request to {url} return status-{status}")
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), f"Get {url}")
+    if VERBOSE:
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), f"Get {url}")
     return response.text
 
 

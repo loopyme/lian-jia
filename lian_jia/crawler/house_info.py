@@ -1,8 +1,5 @@
 import json
 import re
-from pathlib import Path
-
-from tqdm import tqdm
 
 from lian_jia.config import HOUSE_VALUES, RES_DIR
 from lian_jia.request import get
@@ -65,23 +62,27 @@ def get_ershoufang_house_info_per_house(house_url: str):
     return res
 
 
-def get_ershoufang_house_info(url_file: Path):
+def get_ershoufang_house_info(house_district: str):
     res = []
-    with open(url_file, 'r') as f:
-        url_list = json.load(f.read())
+    with open(RES_DIR / "house_url" / "ershoufang" / f"{house_district}.json", 'r') as f:
+        url_list = json.loads(f.read())
     print(f"Load success, find {len(url_list)} urls. Start to get house info from it.")
-    for url in tqdm(url_list):
+    for i, url in enumerate(url_list):
+        if i % 100 == 0:
+            print(house_district, i, len(url_list))
         res.append(get_ershoufang_house_info_per_house(url))
 
-    dump(res, RES_DIR / 'house_info' / url_file)
+    dump(res, RES_DIR / 'house_info' / "ershoufang" / f"{house_district}.json")
 
 
-def get_chengjiao_house_info(url_file: Path):
+def get_chengjiao_house_info(house_district: str):
     res = []
-    with open(url_file, 'r') as f:
-        url_list = json.load(f.read())
+    with open(RES_DIR / "house_url" / "chengjiao" / f"{house_district}.json", 'r') as f:
+        url_list = json.loads(f.read())
     print(f"Load success, find {len(url_list)} urls. Start to get house info from it.")
-    for url in tqdm(url_list):
+    for i, url in enumerate(url_list):
+        if i % 100 == 0:
+            print(house_district, i, len(url_list))
         res.append(get_chengjiao_house_info_per_house(url))
 
-    dump(res, RES_DIR / 'house_info' / url_file)
+    dump(res, RES_DIR / 'house_info' / "chengjiao" / f"{house_district}.json")
