@@ -14,11 +14,11 @@ def dump(obj: Any, path: Path):
         import json
 
         res = json.dumps(obj)
-        file_type = 'w'
+        file_type = "w"
     else:
         import pickle
 
         res = pickle.dumps(obj)
-        file_type = 'wb'
+        file_type = "wb"
     with open(path, file_type) as f:
         f.write(res)

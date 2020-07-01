@@ -11,7 +11,7 @@ LAST_REQUEST_TIME = 0
 
 def get(url: str):
     check_interval()
-    response = requests.get(url, headers={'User-Agent': get_user_agent()})
+    response = requests.get(url, headers={"User-Agent": get_user_agent()})
 
     if (status := response.status_code) != 200:
         warnings.warn(f"Request to {url} return status-{status}")

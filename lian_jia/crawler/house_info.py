@@ -1,5 +1,72 @@
-from bs4 import BeautifulSoup
+import re
+
+from lian_jia.config import HOUSE_VALUES
+from lian_jia.request import get
 
 
-def _extract_basic_info(soup: BeautifulSoup):
-    soup.select('.introContent .content .label')
+def _get_basic_house_info_per_house(web_content: str):
+    res = {}
+    for p in HOUSE_VALUES:
+        re_res = re.search(
+            r'<li><span class="label">{}</span>.+?</li>'.format(p), web_content
+        )
+        if re_res is None:
+            continue
+        res[p] = re_res.group(0).split("</span>")[-1][:-5].strip(" ")
+    return res
+
+
+def get_chengjiao_house_info_per_house(house_url: str):
+    content = get(house_url)
+    res = _get_basic_house_info_per_house(content)
+
+    # 价格
+    re_res = re.search(
+        r'<div class="price"><span class="dealTotalPrice"><i>(\d|.)+?</i>万</span>'
+        r"<b>(\d|.)+?</b>元/平",
+        content,
+    )
+    if re_res is not None:
+        res["成交单价(元/平)"] = re_res.group(0).split("<b>")[-1][:-7]
+        res["成交总价(万元)"] = re_res.group(0).split("</i>")[0][51:]
+
+    re_res = re.search(r"<label>(\d|.)+?</label>挂牌价格（万）", content)
+    if re_res is not None:
+        res["挂牌总价(万元)"] = re_res.group(0).rstrip("</label>挂牌价格（万）")[7:]
+
+    # 成交周期
+    re_res = re.search(r"</span><span><label>\d+?</label>成交周期（天）</span>", content)
+    if re_res is not None:
+        res["成交周期(天)"] = re_res.group(0).split("</label>")[0][20:]
+    return res
+
+
+def get_ershoufang_house_info_per_house(house_url: str):
+    content = get(house_url)
+    res = _get_basic_house_info_per_house(content)
+
+    # price
+    re_res = re.search(
+        r'</div><div class="price "><span class="total">(\d|.)+?</span><span class="unit"><span>万</span></span>'
+        r'<div class="text"><div class="unitPrice"><span class="unitPriceValue">(\d|.)+?<i>元/平米</i>',
+        content,
+    )
+    if re_res is not None:
+        res["挂牌单价(元/平)"] = re_res.group(0).split('<span class="unitPriceValue">')[-1][
+            :-11
+        ]
+        res["挂牌总价(万元)"] = re_res.group(0).split("</span>")[0][46:]
+
+    return res
+
+
+print(
+    get_ershoufang_house_info_per_house(
+        "https://cq.lianjia.com/ershoufang/106104943205.html"
+    )
+)
+print(
+    get_chengjiao_house_info_per_house(
+        "https://cq.lianjia.com/chengjiao/106101522410.html"
+    )
+)
