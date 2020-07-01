@@ -1,7 +1,12 @@
+import json
 import re
+from pathlib import Path
 
-from lian_jia.config import HOUSE_VALUES
+from tqdm import tqdm
+
+from lian_jia.config import HOUSE_VALUES, RES_DIR
 from lian_jia.request import get
+from lian_jia.utils import dump
 
 
 def _get_basic_house_info_per_house(web_content: str):
@@ -53,20 +58,30 @@ def get_ershoufang_house_info_per_house(house_url: str):
     )
     if re_res is not None:
         res["挂牌单价(元/平)"] = re_res.group(0).split('<span class="unitPriceValue">')[-1][
-            :-11
-        ]
+                           :-11
+                           ]
         res["挂牌总价(万元)"] = re_res.group(0).split("</span>")[0][46:]
 
     return res
 
 
-print(
-    get_ershoufang_house_info_per_house(
-        "https://cq.lianjia.com/ershoufang/106104943205.html"
-    )
-)
-print(
-    get_chengjiao_house_info_per_house(
-        "https://cq.lianjia.com/chengjiao/106101522410.html"
-    )
-)
+def get_ershoufang_house_info(url_file: Path):
+    res = []
+    with open(url_file, 'r') as f:
+        url_list = json.load(f.read())
+    print(f"Load success, find {len(url_list)} urls. Start to get house info from it.")
+    for url in tqdm(url_list):
+        res.append(get_ershoufang_house_info_per_house(url))
+
+    dump(res, RES_DIR / 'house_info' / url_file)
+
+
+def get_chengjiao_house_info(url_file: Path):
+    res = []
+    with open(url_file, 'r') as f:
+        url_list = json.load(f.read())
+    print(f"Load success, find {len(url_list)} urls. Start to get house info from it.")
+    for url in tqdm(url_list):
+        res.append(get_chengjiao_house_info_per_house(url))
+
+    dump(res, RES_DIR / 'house_info' / url_file)
