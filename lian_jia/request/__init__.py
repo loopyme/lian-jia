@@ -13,14 +13,14 @@ def get(url: str):
     check_interval()
     response = requests.get(url, headers={"User-Agent": get_user_agent()})
 
-    if (status := response.status_code) != 200:
-        warnings.warn(f"Request to {url} return status-{status}")
+    if response.status_code != 200:
+        warnings.warn(f"Request to {url} return status-{response.status_code}")
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), f"Get {url}")
     return response.text
 
 
 def check_interval():
     global LAST_REQUEST_TIME
-    if not (now := time.time()) > LAST_REQUEST_TIME + INTERVAL:
-        time.sleep(LAST_REQUEST_TIME + INTERVAL - now)
+    if not time.time() > LAST_REQUEST_TIME + INTERVAL:
+        time.sleep(LAST_REQUEST_TIME + INTERVAL - time.time())
     LAST_REQUEST_TIME = time.time()
