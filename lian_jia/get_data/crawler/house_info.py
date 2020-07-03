@@ -1,9 +1,10 @@
 import json
 import re
 
-from lian_jia.config import HOUSE_VALUES, RES_DIR
-from lian_jia.request import get
-from lian_jia.utils import dump
+from lian_jia.config import DATA_DIR
+from lian_jia.get_data.config import HOUSE_VALUES
+from lian_jia.get_data.request import get
+from lian_jia.get_data.utils import dump
 
 
 def _get_basic_house_info_per_house(web_content: str):
@@ -65,7 +66,7 @@ def get_ershoufang_house_info_per_house(house_url: str):
 def get_ershoufang_house_info(house_district: str):
     res = []
     with open(
-            RES_DIR / "house_url" / "ershoufang" / f"{house_district}.json", "r"
+            DATA_DIR / "house_url" / "ershoufang" / f"{house_district}.json", "r"
     ) as f:
         url_list = json.loads(f.read())
     print(f"Load success, find {len(url_list)} urls. Start to get house info from it.")
@@ -74,12 +75,12 @@ def get_ershoufang_house_info(house_district: str):
             print(house_district, i, len(url_list))
         res.append(get_ershoufang_house_info_per_house(url))
 
-    dump(res, RES_DIR / "house_info" / "ershoufang" / f"{house_district}.json")
+    dump(res, DATA_DIR / "house_info" / "ershoufang" / f"{house_district}.json")
 
 
 def get_chengjiao_house_info(house_district: str):
     res = []
-    with open(RES_DIR / "house_url" / "chengjiao" / f"{house_district}.json", "r") as f:
+    with open(DATA_DIR / "house_url" / "chengjiao" / f"{house_district}.json", "r") as f:
         url_list = json.loads(f.read())
     print(f"Load success, find {len(url_list)} urls. Start to get house info from it.")
     for i, url in enumerate(url_list):
@@ -87,4 +88,4 @@ def get_chengjiao_house_info(house_district: str):
             print(house_district, i, len(url_list))
         res.append(get_chengjiao_house_info_per_house(url))
 
-    dump(res, RES_DIR / "house_info" / "chengjiao" / f"{house_district}.json")
+    dump(res, DATA_DIR / "house_info" / "chengjiao" / f"{house_district}.json")

@@ -1,9 +1,10 @@
 import re
 from typing import List
 
-from lian_jia.config import RES_DIR, HOUSE_DISTRICT
-from lian_jia.request import get
-from lian_jia.utils import dump
+from lian_jia.config import DATA_DIR
+from lian_jia.get_data import HOUSE_DISTRICT
+from lian_jia.get_data import dump
+from lian_jia.get_data import get
 
 
 def _get_house_url(type: str) -> List[str]:
@@ -22,7 +23,7 @@ def _get_house_url(type: str) -> List[str]:
         for i in range(1, 101):
             res += get_house_url_per_page(d, i)
 
-        dump(list(set(res)), RES_DIR / "house_url" / type / f"{d}.json")
+        dump(list(set(res)), DATA_DIR / "house_url" / type / f"{d}.json")
         res = []
 
 
